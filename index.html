@@ -194,27 +194,27 @@ body{
 /* ===== FOOTER ===== */
 .footer{text-align:center;padding:24px 0 8px;font-size:11px;color:#37474F;letter-spacing:0.5px}
 
-/* ===== BOXPLOT ===== */
-.bp-wrap{display:flex;align-items:center;gap:16px;height:100%}
-.bp-main{flex:1;height:250px}
-.bp-side{width:195px;flex-shrink:0}
+/* ===== INTERVIEWER METRIC ===== */
+.iv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;height:100%;align-content:center}
+.iv-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(33,150,243,0.04);border:1px solid rgba(33,150,243,0.08);
+  border-radius:12px;padding:20px 12px;text-align:center
+}
+.iv-item .ivv{
+  font-size:30px;font-weight:700;color:#64B5F6;line-height:1.2
+}
+.iv-item .ivv.gold{color:#FFC107}
+.iv-item .ivv.green{color:#4CAF50}
+.iv-item .ivl{font-size:11px;color:#78909C;margin-top:4px;letter-spacing:0.5px}
+.iv-item .ivsub{font-size:10px;color:#546E7A;margin-top:2px}
 
-/* ===== DATA AREA ===== */
-.data-area{
-  background:#0a0e1a;border-radius:10px;padding:14px 18px;margin-bottom:18px;
-  border:1px solid rgba(33,150,243,0.08);
-}
-.data-area .dt{
-  color:#64B5F6;font-weight:600;font-size:11px;margin-bottom:8px;display:flex;align-items:center;gap:8px
-}
-.data-area code{
-  color:#80CBC4;white-space:pre-wrap;display:block;font-size:10px;line-height:1.6;
-  font-family:'SF Mono','JetBrains Mono','Fira Code',monospace;
-}
-.data-area .cm{color:#546E7A}
-.data-area .hint{font-size:10px;color:#455A64;margin-top:6px}
+/* ===== SCORE LINE ===== */
+.sl-wrap{display:flex;align-items:center;gap:16px;height:100%}
+.sl-main{flex:1;height:250px}
+.sl-side{width:195px;flex-shrink:0}
 
-/* ===== RESPONSIVE ===== */
+/* ===== TOP LIST ===== */
 @media(max-width:1024px){
   .grid2,.grid4{grid-template-columns:1fr}
   .grid3{grid-template-columns:1fr 1fr}
@@ -307,9 +307,13 @@ body{
     <div id="chart5" class="chart-box"></div>
   </div>
   <div class="card">
-    <div class="card-title"><span class="num">6</span> 面试官出勤 <span class="highlight">出勤率 100%</span></div>
-    <div class="section-label"><span class="dot" style="color:#4CAF50;background:#4CAF50"></span> 各部门面试官全部到岗，配合度卓越</div>
-    <div id="chart6" class="chart-box"></div>
+    <div class="card-title"><span class="num">6</span> 面试官出勤 <span class="highlight">出席率 100%</span></div>
+    <div class="section-label"><span class="dot" style="color:#4CAF50;background:#4CAF50"></span> 8位面试官全部到岗，其中一级部门负责人出席2人，体现管理层高度重视</div>
+    <div class="iv-grid">
+      <div class="iv-item"><div class="ivv green">8</div><div class="ivl">面试官总人数</div></div>
+      <div class="iv-item"><div class="ivv green">8</div><div class="ivl">实际出勤</div><div class="ivsub">100% 全员到齐</div></div>
+      <div class="iv-item"><div class="ivv gold">2</div><div class="ivl">一级部门负责人</div><div class="ivsub">高度重视项目</div></div>
+    </div>
   </div>
 </div>
 
@@ -326,45 +330,15 @@ body{
   </div>
   <div class="card">
     <div class="card-title"><span class="num">8</span> 群面得分 <span class="highlight">TOP6全为待推进</span></div>
-    <div class="section-label"><span class="dot" style="color:#FFC107;background:#FFC107"></span> 待推进候选人全部入围高分行列</div>
-    <div class="bp-wrap">
-      <div class="bp-main"><div id="chart8" style="width:100%;height:100%"></div></div>
-      <div class="bp-side">
+    <div class="section-label"><span class="dot" style="color:#FFC107;background:#FFC107"></span> 待推进候选人得分趋势，全部领跑榜单</div>
+    <div class="sl-wrap">
+      <div class="sl-main"><div id="chart8" style="width:100%;height:100%"></div></div>
+      <div class="sl-side">
         <div style="font-size:11px;font-weight:600;color:#e8eaf0;margin-bottom:5px;letter-spacing:0.5px">TOP 榜单</div>
         <ul class="top-list" id="topList"></ul>
       </div>
     </div>
   </div>
-</div>
-
-<!-- ================ DATA CONFIG ================ -->
-<div class="data-area">
-  <div class="dt">&#9881; 数据配置区</div>
-  <code>
-<span class="cm">// 列名: 姓名,性别,学历,最高院校,院校类型(985/211/双一流/普通本科),城市,专业,面试结果(通过/淘汰),群面得分,是否进入下一流程(是/否)</span>
-const CANDIDATES = [
-  ["庄留星","女","硕士","哈尔滨工业大学","985","哈尔滨","城乡规划学","通过",92,"是"],
-  ["叶琳","女","硕士","厦门大学","985","厦门","国际商务","通过",89,"是"],
-  ["徐大卫","男","硕士","香港城市大学","普通本科","香港","运营与供应链管理","通过",95,"是"],
-  ["区茵月","女","硕士","香港理工大学","普通本科","香港","物流与供应链管理","通过",88,"是"],
-  ["何锦峰","男","硕士","深圳大学","普通本科","深圳","交通运输","通过",85,"是"],
-  ["李雅琪","女","硕士","深圳大学","普通本科","深圳","统计学","通过",78,"是"],
-  ["邢琦琦","女","本科","中山大学","985","广州","智能科学与技术","淘汰",72,"否"],
-  ["刘品含","男","本科","深圳大学","普通本科","深圳","电子商务","淘汰",58,"否"],
-  ["黄健","男","硕士","暨南大学","211","广州","生物与医药","淘汰",62,"否"],
-  ["高子棋","女","硕士","深圳大学","普通本科","深圳","城市规划","淘汰",68,"否"],
-  ["党睿琪","女","硕士","深圳大学","普通本科","深圳","统计学","淘汰",60,"否"]
-];
-
-<span class="cm">// 系统参数 - 修改此处无需上传Excel</span>
-const SYS = {
-  funnel: { 报名:60, 初筛到场:32, 完成全流程面试:11, 进入下一流程:6 },
-  passBenchmark: { 初筛:65, 单面:50, 群面:45 },
-  interviewer: [["业务部",3,3],["技术部",2,2],["市场部",1,1],["人力部",1,1],["运营部",1,1]],
-  meeting: { 总场次:15, 准时率:96.4, 异常次数:1 }
-};
-  </code>
-  <div class="hint">&#9432; 修改上方CANDIDATES数组后刷新页面即可生效。上传Excel可批量替换数据。</div>
 </div>
 
 <div class="footer">
@@ -394,7 +368,7 @@ var CANDIDATES = [
 var SYS = {
   funnel: { 报名:60, 初筛到场:32, 完成全流程面试:11, 进入下一流程:6 },
   passBenchmark: { 初筛:65, 单面:50, 群面:45 },
-  interviewer: [["业务部",3,3],["技术部",2,2],["市场部",1,1],["人力部",1,1],["运营部",1,1]],
+  interviewer: { total:8, attended:8, heads:2 },
   meeting: { 总场次:15, 准时率:96.4, 异常次数:1 }
 };
 
@@ -593,66 +567,57 @@ function renderSchool(){
 }
 
 // ================================================================
-// CHART 6: INTERVIEWER
+// CHART 8: SCORE LINE
 // ================================================================
-function renderInterviewer(){
-  var c6=echarts.init(document.getElementById('chart6'));
-  var iv=SYS.interviewer;
-  var depts=iv.map(function(d){return d[0]}), exp=iv.map(function(d){return d[1]}), act=iv.map(function(d){return d[2]});
-  var tExp=exp.reduce(function(a,b){return a+b},0), tAct=act.reduce(function(a,b){return a+b},0);
-  c6.setOption({
-    tooltip:{trigger:'axis',formatter:function(ps){
-      var s=ps[0].axisValue+'<br/>';
-      ps.forEach(function(p){s+='<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+p.color+';margin-right:4px"></span>'+p.seriesName+': <b>'+p.value+'</b><br/>'});
-      return s;
-    }},
-    legend:{data:['应到','实到','缺勤'],bottom:0,textStyle:{fontSize:9,color:'#78909C'},icon:'roundRect',itemWidth:10,itemHeight:6},
-    grid:{left:40,right:15,top:10,bottom:40},
-    xAxis:{type:'category',data:depts,axisLabel:{fontSize:11,fontWeight:600,color:'#b0bec5'}},
-    yAxis:{type:'value',axisLabel:{color:'#546E7A'},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)',type:'dashed'}}},
-    series:[{
-      name:'应到',type:'bar',barWidth:'22%',barGap:'5%',
-      data:exp.map(function(v){return{value:v,itemStyle:{color:'rgba(33,150,243,0.5)',borderRadius:[3,3,0,0]}}})
-    },{
-      name:'实到',type:'bar',barWidth:'22%',
-      data:act.map(function(v,i){
-        return{value:v,itemStyle:{color:v===exp[i]?'#4CAF50':'#81C784',borderRadius:[3,3,0,0]}};
-      }),
-      label:{show:true,position:'top',formatter:function(){return tAct+'/'+tExp+' 全员到齐';},fontSize:10,fontWeight:600,color:'#4CAF50'}
-    },{
-      name:'缺勤',type:'bar',barWidth:'22%',
-      data:exp.map(function(v,i){return{value:v-act[i],itemStyle:{color:act[i]<v?'rgba(239,154,154,0.5)':'rgba(255,255,255,0.03)',borderRadius:[3,3,0,0]}}})
-    }]
-  });window.addEventListener('resize',function(){c6.resize()});
-}
-
-// ================================================================
-// CHART 8: BOXPLOT
-// ================================================================
-function renderBoxplot(){
+function renderScoreLine(){
   var c8=echarts.init(document.getElementById('chart8'));
-  var sc=CANDIDATES.map(function(d){return d[8]}).sort(function(a,b){return a-b});
-  var min=sc[0],max=sc[sc.length-1],q1=sc[Math.floor(sc.length*0.25)],med=sc[Math.floor(sc.length*0.5)],q3=sc[Math.floor(sc.length*0.75)];
   var next=getNext().sort(function(a,b){return b[8]-a[8]});
+  var names=next.map(function(d){return d[0]});
+  var scores=next.map(function(d){return d[8]});
+
   c8.setOption({
-    tooltip:{trigger:'axis',formatter:function(){
-      return '群面得分<br/>最小值: '+min+'<br/>Q1: '+q1+'<br/>中位数: '+med+'<br/>Q3: '+q3+'<br/>最大值: '+max;
+    tooltip:{trigger:'axis',formatter:function(ps){
+      var p=ps[0];
+      return p.name+'<br/>群面得分: <b>'+p.value+'</b> 分';
     }},
-    grid:{left:40,right:15,top:15,bottom:25},
-    xAxis:{type:'category',data:['群面得分'],axisLabel:{fontSize:12,fontWeight:600,color:'#b0bec5'}},
-    yAxis:{type:'value',min:40,max:100,axisLabel:{formatter:'{value}分',color:'#546E7A'},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)',type:'dashed'}}},
+    grid:{left:40,right:15,top:20,bottom:30},
+    xAxis:{
+      type:'category',data:names,boundaryGap:false,
+      axisLabel:{fontSize:11,fontWeight:600,color:'#b0bec5',rotate:0},
+      axisLine:{lineStyle:{color:'rgba(33,150,243,0.15)'}},
+      splitLine:{show:false}
+    },
+    yAxis:{
+      type:'value',min:70,max:100,
+      axisLabel:{formatter:'{value}分',color:'#546E7A'},
+      splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)',type:'dashed'}}
+    },
     series:[{
-      name:'分布',type:'boxplot',data:[[min,q1,med,q3,max]],
-      itemStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(33,150,243,0.5)'},{offset:1,color:'rgba(0,188,212,0.4)'}]},borderColor:'#64B5F6',borderWidth:2},
-      width:'35%'
-    },{
-      name:'高分',type:'scatter',
-      data:next.map(function(d){
-        return{value:[0,d[8]],itemStyle:{color:{type:'radial',colorStops:[{offset:0,color:'#FFC107'},{offset:1,color:'#FF8F00'}]},borderColor:'#fff',borderWidth:1},symbolSize:d[8]>=90?14:10};
+      type:'line',smooth:true,
+      data:scores.map(function(v,i){
+        var item={value:v};
+        // Gradient area
+        return item;
       }),
-      label:{show:true,position:'top',formatter:function(p){return p.value[1]+'分'},fontSize:10,fontWeight:600,color:'#FFC107'}
+      lineStyle:{width:3,color:'#64B5F6',shadowBlur:8,shadowColor:'rgba(33,150,243,0.3)'},
+      areaStyle:{
+        color:{type:'linear',x:0,y:0,x2:0,y2:1,
+          colorStops:[{offset:0,color:'rgba(33,150,243,0.35)'},{offset:1,color:'rgba(33,150,243,0.02)']}
+      },
+      symbol:'circle',symbolSize:10,
+      itemStyle:{color:'#1565C0',borderColor:'#fff',borderWidth:2},
+      label:{
+        show:true,position:'top',
+        formatter:'{c}分',fontSize:11,fontWeight:700,color:'#64B5F6'
+      },
+      markLine:{
+        silent:true,
+        label:{show:true,formatter:'平均: {c}分',fontSize:10,color:'#546E7A'},
+        data:[{type:'average',lineStyle:{color:'rgba(255,255,255,0.2)',type:'dashed'}}]
+      }
     }]
-  });window.addEventListener('resize',function(){c8.resize()});
+  });
+  window.addEventListener('resize',function(){c8.resize()});
 
   // TOP list
   var tl='',tcols=['rk1','rk2','rk3','rkn','rkn','rkn'];
@@ -708,7 +673,7 @@ document.getElementById('downloadTmpl').addEventListener('click',function(){
   XLSX.writeFile(wb,'GEU管培生面试数据模板.xlsx');
 });
 
-function renderAll(){renderEdu();renderFunnel();renderPassRate();renderCity();renderSchool();renderInterviewer();renderBoxplot();}
+function renderAll(){renderEdu();renderFunnel();renderPassRate();renderCity();renderSchool();renderScoreLine();}
 renderAll();
 </script>
 </body>
