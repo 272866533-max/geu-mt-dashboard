@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEU 26届管培生 · 面试复盘全景看板</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Inter','Segoe UI','PingFang SC','Microsoft YaHei',-apple-system,sans-serif;
+  background:#070b14;color:#e8eaf0;padding:20px 28px;
+  background-image:radial-gradient(ellipse at 20% 50%, rgba(33,150,243,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(0,188,212,0.04) 0%, transparent 50%);
+  min-height:100vh;
+}
+.wrapper{max-width:1600px;margin:0 auto}
+
+/* ===== HEADER ===== */
+.header{
+  background:linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a1628 100%);
+  border-radius:16px;padding:32px 40px;margin-bottom:20px;
+  border:1px solid rgba(33,150,243,0.15);
+  position:relative;overflow:hidden;
+  box-shadow:0 0 60px rgba(33,150,243,0.05), inset 0 1px 0 rgba(33,150,243,0.1);
+}
+.header::before{
+  content:'';position:absolute;top:-60%;right:-10%;
+  width:400px;height:400px;
+  background:radial-gradient(circle, rgba(33,150,243,0.08) 0%, transparent 70%);
+  border-radius:50%;
+}
+.header .tag{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(33,150,243,0.1);border:1px solid rgba(33,150,243,0.2);
+  padding:5px 16px;border-radius:20px;font-size:11px;font-weight:600;
+  color:#64B5F6;letter-spacing:1px;margin-bottom:14px;
+}
+.header .tag::before{content:'';width:6px;height:6px;border-radius:50%;background:#64B5F6;display:inline-block}
+.header h1{
+  font-size:26px;font-weight:700;color:#fff;margin-bottom:10px;
+  letter-spacing:-0.3px;
+}
+.header .summary{
+  font-size:14px;line-height:1.8;color:#b0bec5;max-width:90%
+}
+.header .hl{
+  color:#64B5F6;font-weight:600
+}
+.header .stats-row{display:flex;gap:32px;margin-top:16px}
+.header .stat-item{text-align:center}
+.header .stat-item .num{font-size:28px;font-weight:700;color:#fff;line-height:1;letter-spacing:-1px}
+.header .stat-item .lbl{font-size:11px;color:#78909C;margin-top:3px;letter-spacing:0.5px}
+
+/* ===== UPLOAD BAR ===== */
+.upload-bar{
+  background:linear-gradient(135deg, rgba(10,22,40,0.9), rgba(13,33,55,0.9));
+  border:1px solid rgba(33,150,243,0.25);border-radius:12px;
+  padding:14px 22px;margin-bottom:20px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  backdrop-filter:blur(10px);
+}
+.upload-bar .label{font-size:12px;font-weight:600;color:#64B5F6;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.upload-bar input[type=file]{
+  font-size:12px;padding:5px 12px;
+  border:1px solid rgba(33,150,243,0.2);border-radius:8px;
+  background:rgba(255,255,255,0.03);color:#b0bec5;
+  cursor:pointer;flex:1;min-width:180px
+}
+.upload-bar .hint{font-size:11px;color:#546E7A}
+.upload-bar .btn-dl{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 18px;border-radius:8px;
+  background:linear-gradient(135deg,#1565C0,#0d47a1);
+  color:#fff;text-decoration:none;font-size:12px;font-weight:600;
+  cursor:pointer;border:none;transition:all 0.2s
+}
+.upload-bar .btn-dl:hover{background:linear-gradient(135deg,#1976D2,#1565C0);box-shadow:0 0 20px rgba(33,150,243,0.2)}
+.upload-bar .status{font-size:12px;font-weight:600}
+
+/* ===== CARD ===== */
+.card{
+  background:linear-gradient(135deg, rgba(16,24,44,0.95), rgba(10,18,32,0.95));
+  border-radius:14px;
+  border:1px solid rgba(33,150,243,0.1);
+  padding:20px 24px;
+  box-shadow:0 0 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(33,150,243,0.05);
+  transition:all 0.25s ease;
+}
+.card:hover{border-color:rgba(33,150,243,0.25);box-shadow:0 0 40px rgba(33,150,243,0.08)}
+.card-title{
+  font-size:13px;font-weight:600;color:#e8eaf0;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;letter-spacing:0.3px;
+}
+.card-title .num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:6px;font-size:10px;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,#1565C0,#00BCD4);flex-shrink:0;
+  box-shadow:0 0 10px rgba(0,188,212,0.3);
+}
+.chart-box{width:100%;height:270px}
+.chart-sm{height:220px}
+
+/* ===== GRID ===== */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+
+/* ===== METRIC ===== */
+.metric{
+  background:linear-gradient(135deg, rgba(33,150,243,0.06), rgba(0,188,212,0.04));
+  border:1px solid rgba(33,150,243,0.1);
+  border-radius:12px;padding:16px;text-align:center
+}
+.metric .val{font-size:30px;font-weight:700;color:#64B5F6;line-height:1.2}
+.metric .val.green{color:#4CAF50}
+.metric .val.gold{color:#FFC107}
+.metric .val.cyan{color:#00BCD4}
+.metric .lbl{font-size:11px;color:#78909C;margin-top:4px;letter-spacing:0.5px}
+.metric .badge{
+  display:inline-block;padding:1px 8px;border-radius:6px;
+  font-size:9px;font-weight:700;margin-top:3px;letter-spacing:0.5px;
+  background:rgba(0,188,212,0.15);color:#00BCD4;
+}
+
+/* ===== HIGHLIGHT ===== */
+.highlight{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.2);
+  color:#4CAF50;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:600;margin-left:8px;
+  letter-spacing:0.3px;
+}
+
+/* ===== HEATMAP ===== */
+.hm-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:6px}
+.hm-cell{
+  border-radius:8px;padding:7px 3px;text-align:center;font-size:11px;
+  font-weight:600;min-height:42px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center
+}
+.hm-cell .ct{font-size:12px;font-weight:700}
+.hm-cell .cnt{font-size:10px;opacity:.85;margin-top:1px}
+
+/* ===== TOP LIST ===== */
+.top-list{list-style:none;padding:0;margin:0}
+.top-list li{
+  display:flex;align-items:center;padding:6px 10px;
+  border-bottom:1px solid rgba(33,150,243,0.08);font-size:12px
+}
+.top-list li:last-child{border-bottom:none}
+.top-list .rk{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:50%;font-size:10px;font-weight:700;color:#fff;margin-right:8px;flex-shrink:0
+}
+.top-list .rk1{background:linear-gradient(135deg,#FF6F00,#FFB300)}
+.top-list .rk2{background:linear-gradient(135deg,#0288D1,#4FC3F7)}
+.top-list .rk3{background:linear-gradient(135deg,#00796B,#26A69A)}
+.top-list .rkn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15)}
+.top-list .nm{flex:1;font-weight:600;color:#e8eaf0}
+.top-list .sc{font-weight:700;color:#64B5F6;font-size:14px}
+.top-list .adv{
+  display:inline-block;background:linear-gradient(135deg,#4CAF50,#388E3C);
+  color:#fff;padding:1px 7px;border-radius:6px;font-size:9px;font-weight:700;margin-left:6px;letter-spacing:0.5px
+}
+
+/* ===== FUNNEL HIGHLIGHT ===== */
+.funnel-hl{
+  display:flex;align-items:center;gap:10px;margin-top:10px;
+  background:rgba(0,188,212,0.06);border:1px solid rgba(0,188,212,0.15);
+  border-radius:10px;padding:10px 16px
+}
+.funnel-hl .big{font-size:28px;font-weight:700;color:#00BCD4;line-height:1}
+.funnel-hl .desc{font-size:12px;color:#80CBC4}
+
+/* ===== KPI ===== */
+.kpi-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;height:100%}
+.kpi-item{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(33,150,243,0.04);border:1px solid rgba(33,150,243,0.08);
+  border-radius:12px;padding:18px 12px;text-align:center
+}
+.kpi-item .kv{
+  font-size:32px;font-weight:700;
+  background:linear-gradient(135deg,#64B5F6,#00BCD4);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2
+}
+.kpi-item .kl{font-size:11px;color:#78909C;margin-top:4px;letter-spacing:0.5px}
+
+/* ===== SECTION LABEL ===== */
+.section-label{font-size:10px;color:#546E7A;margin-bottom:8px;display:flex;align-items:center;gap:6px;letter-spacing:0.3px}
+.section-label .dot{width:5px;height:5px;border-radius:50%;display:inline-block;box-shadow:0 0 6px currentColor}
+
+/* ===== FOOTER ===== */
+.footer{text-align:center;padding:24px 0 8px;font-size:11px;color:#37474F;letter-spacing:0.5px}
+
+/* ===== BOXPLOT ===== */
+.bp-wrap{display:flex;align-items:center;gap:16px;height:100%}
+.bp-main{flex:1;height:250px}
+.bp-side{width:195px;flex-shrink:0}
+
+/* ===== DATA AREA ===== */
+.data-area{
+  background:#0a0e1a;border-radius:10px;padding:14px 18px;margin-bottom:18px;
+  border:1px solid rgba(33,150,243,0.08);
+}
+.data-area .dt{
+  color:#64B5F6;font-weight:600;font-size:11px;margin-bottom:8px;display:flex;align-items:center;gap:8px
+}
+.data-area code{
+  color:#80CBC4;white-space:pre-wrap;display:block;font-size:10px;line-height:1.6;
+  font-family:'SF Mono','JetBrains Mono','Fira Code',monospace;
+}
+.data-area .cm{color:#546E7A}
+.data-area .hint{font-size:10px;color:#455A64;margin-top:6px}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1024px){
+  .grid2,.grid4{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr 1fr}
+  .hm-grid{grid-template-columns:repeat(4,1fr)}
+  .header .summary{max-width:100%}
+}
+@media(max-width:640px){
+  .grid3{grid-template-columns:1fr}
+  .hm-grid{grid-template-columns:repeat(3,1fr)}
+  .kpi-row{grid-template-columns:1fr}
+  body{padding:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- ================ HEADER ================ -->
+<div class="header">
+  <div class="tag">战略招聘复盘</div>
+  <h1>GEU 26届管培生 · 面试全景看板</h1>
+  <div class="summary">
+    本期全流程面试 <span class="hl">11人</span>，线下专场招聘，生源覆盖985/211及重点港校，
+    硕士学历占比 <span class="hl">81.8%</span>，面试官出勤率 <span class="hl">100%</span>。
+    经综合评估，<span class="hl">6名</span>① 优质候选人进入下一环节，用人部门反馈优异。
+  </div>
+  <div class="stats-row">
+    <div class="stat-item"><div class="num">11</div><div class="lbl">全流程面试</div></div>
+    <div class="stat-item"><div class="num">6</div><div class="lbl">通过推进</div></div>
+    <div class="stat-item"><div class="num">81.8%</div><div class="lbl">硕士占比</div></div>
+    <div class="stat-item"><div class="num">100%</div><div class="lbl">面试官出勤</div></div>
+  </div>
+  <div style="font-size:10px;color:#455A64;margin-top:10px;position:relative;z-index:1;">
+    &#9432; 招聘负责人：待确认 &middot; 面试方式：线下专场 &middot; ①含李雅琪（原淘汰，已修正为通过）
+  </div>
+</div>
+
+<!-- ================ UPLOAD ================ -->
+<div class="upload-bar">
+  <span class="label">&#9881; 数据更新</span>
+  <input type="file" id="fileInput" accept=".xlsx,.xls">
+  <span class="hint">上传Excel自动刷新全看板</span>
+  <button class="btn-dl" id="downloadTmpl">&#8681; 下载模板</button>
+  <span class="status" id="uploadStatus" style="color:#4CAF50;"></span>
+</div>
+
+<!-- ================ MODULE 1+2 ================ -->
+<div class="grid2">
+  <div class="card">
+    <div class="card-title"><span class="num">1</span> 学历维度 <span class="highlight">硕博占比 81.8%</span></div>
+    <div class="section-label"><span class="dot" style="color:#64B5F6;background:#64B5F6"></span> 硕士学历占比超八成，学历结构优质</div>
+    <div id="chart1" class="chart-box"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="num">2</span> 人员漏斗 <span class="highlight">6人进入下一流程</span></div>
+    <div class="section-label"><span class="dot" style="color:#00BCD4;background:#00BCD4"></span> 从报名到终面，精准锁定优质人才</div>
+    <div id="chart2" class="chart-box"></div>
+    <div class="funnel-hl">
+      <span class="big">6</span>
+      <span class="desc">名候选人成功推进后续招聘环节</span>
+    </div>
+  </div>
+</div>
+
+<!-- ================ MODULE 3+4 ================ -->
+<div class="grid2">
+  <div class="card">
+    <div class="card-title"><span class="num">3</span> 通过率对比 <span class="highlight">高于往期基准</span></div>
+    <div class="section-label"><span class="dot" style="color:#4CAF50;background:#4CAF50"></span> 各环节通过率均高于往期基准（绿柱）</div>
+    <div id="chart3" class="chart-box"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="num">4</span> 城市分布 <span class="highlight">大湾区为主力来源</span></div>
+    <div class="section-label"><span class="dot" style="color:#42A5F5;background:#42A5F5"></span> 人才富集于粤港澳大湾区核心城市</div>
+    <div style="display:grid;grid-template-columns:3fr 2fr;gap:12px">
+      <div id="chart4" class="chart-sm"></div>
+      <div>
+        <div style="font-size:10px;color:#546E7A;font-weight:600;margin-bottom:4px;letter-spacing:0.5px">&#127758; 地域热力分布</div>
+        <div class="hm-grid" id="heatmapGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================ MODULE 5+6 ================ -->
+<div class="grid2">
+  <div class="card">
+    <div class="card-title"><span class="num">5</span> 院校层次 <span class="highlight">985/211+港校 54.5%</span></div>
+    <div class="section-label"><span class="dot" style="color:#00BCD4;background:#00BCD4"></span> 超半数候选人来自重点高校及港校</div>
+    <div id="chart5" class="chart-box"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="num">6</span> 面试官出勤 <span class="highlight">出勤率 100%</span></div>
+    <div class="section-label"><span class="dot" style="color:#4CAF50;background:#4CAF50"></span> 各部门面试官全部到岗，配合度卓越</div>
+    <div id="chart6" class="chart-box"></div>
+  </div>
+</div>
+
+<!-- ================ MODULE 7+8 ================ -->
+<div class="grid2">
+  <div class="card">
+    <div class="card-title"><span class="num">7</span> 会务管控 <span class="highlight">准时率 96.4%</span></div>
+    <div class="section-label"><span class="dot" style="color:#00BCD4;background:#00BCD4"></span> 面试组织规范有序，异常可控</div>
+    <div class="kpi-row">
+      <div class="kpi-item"><div class="kv">15</div><div class="kl">面试总场次</div></div>
+      <div class="kpi-item"><div class="kv">96.4%</div><div class="kl">准时开场率</div></div>
+      <div class="kpi-item"><div class="kv">1</div><div class="kl">流程异常次数</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="num">8</span> 群面得分 <span class="highlight">TOP6全为待推进</span></div>
+    <div class="section-label"><span class="dot" style="color:#FFC107;background:#FFC107"></span> 待推进候选人全部入围高分行列</div>
+    <div class="bp-wrap">
+      <div class="bp-main"><div id="chart8" style="width:100%;height:100%"></div></div>
+      <div class="bp-side">
+        <div style="font-size:11px;font-weight:600;color:#e8eaf0;margin-bottom:5px;letter-spacing:0.5px">TOP 榜单</div>
+        <ul class="top-list" id="topList"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================ DATA CONFIG ================ -->
+<div class="data-area">
+  <div class="dt">&#9881; 数据配置区</div>
+  <code>
+<span class="cm">// 列名: 姓名,性别,学历,最高院校,院校类型(985/211/双一流/普通本科),城市,专业,面试结果(通过/淘汰),群面得分,是否进入下一流程(是/否)</span>
+const CANDIDATES = [
+  ["庄留星","女","硕士","哈尔滨工业大学","985","哈尔滨","城乡规划学","通过",92,"是"],
+  ["叶琳","女","硕士","厦门大学","985","厦门","国际商务","通过",89,"是"],
+  ["徐大卫","男","硕士","香港城市大学","普通本科","香港","运营与供应链管理","通过",95,"是"],
+  ["区茵月","女","硕士","香港理工大学","普通本科","香港","物流与供应链管理","通过",88,"是"],
+  ["何锦峰","男","硕士","深圳大学","普通本科","深圳","交通运输","通过",85,"是"],
+  ["李雅琪","女","硕士","深圳大学","普通本科","深圳","统计学","通过",78,"是"],
+  ["邢琦琦","女","本科","中山大学","985","广州","智能科学与技术","淘汰",72,"否"],
+  ["刘品含","男","本科","深圳大学","普通本科","深圳","电子商务","淘汰",58,"否"],
+  ["黄健","男","硕士","暨南大学","211","广州","生物与医药","淘汰",62,"否"],
+  ["高子棋","女","硕士","深圳大学","普通本科","深圳","城市规划","淘汰",68,"否"],
+  ["党睿琪","女","硕士","深圳大学","普通本科","深圳","统计学","淘汰",60,"否"]
+];
+
+<span class="cm">// 系统参数 - 修改此处无需上传Excel</span>
+const SYS = {
+  funnel: { 报名:60, 初筛到场:32, 完成全流程面试:11, 进入下一流程:6 },
+  passBenchmark: { 初筛:65, 单面:50, 群面:45 },
+  interviewer: [["业务部",3,3],["技术部",2,2],["市场部",1,1],["人力部",1,1],["运营部",1,1]],
+  meeting: { 总场次:15, 准时率:96.4, 异常次数:1 }
+};
+  </code>
+  <div class="hint">&#9432; 修改上方CANDIDATES数组后刷新页面即可生效。上传Excel可批量替换数据。</div>
+</div>
+
+<div class="footer">
+  HR 运营团队 &middot; GEU 26届管培生面试复盘 &middot; 2026-06-03
+</div>
+</div>
+
+<script>
+// ================================================================
+// DATA — 李雅琪已改为通过
+// ================================================================
+var CANDIDATES = [
+  ["庄留星","女","硕士","哈尔滨工业大学","985","哈尔滨","城乡规划学","通过",92,"是"],
+  ["叶琳","女","硕士","厦门大学","985","厦门","国际商务","通过",89,"是"],
+  ["徐大卫","男","硕士","香港城市大学","普通本科","香港","运营与供应链管理","通过",95,"是"],
+  ["区茵月","女","硕士","香港理工大学","普通本科","香港","物流与供应链管理","通过",88,"是"],
+  ["何锦峰","男","硕士","深圳大学","普通本科","深圳","交通运输","通过",85,"是"],
+  ["李雅琪","女","硕士","深圳大学","普通本科","深圳","统计学","通过",78,"是"],
+  ["邢琦琦","女","本科","中山大学","985","广州","智能科学与技术","淘汰",72,"否"],
+  ["刘品含","男","本科","深圳大学","普通本科","深圳","电子商务","淘汰",58,"否"],
+  ["黄健","男","硕士","暨南大学","211","广州","生物与医药","淘汰",62,"否"],
+  ["高子棋","女","硕士","深圳大学","普通本科","深圳","城市规划","淘汰",68,"否"],
+  ["党睿琪","女","硕士","深圳大学","普通本科","深圳","统计学","淘汰",60,"否"]
+];
+// idx: 0=姓名,1=性别,2=学历,3=最高院校,4=院校类型,5=城市,6=专业,7=结果,8=群面得分,9=进入下一流程
+
+var SYS = {
+  funnel: { 报名:60, 初筛到场:32, 完成全流程面试:11, 进入下一流程:6 },
+  passBenchmark: { 初筛:65, 单面:50, 群面:45 },
+  interviewer: [["业务部",3,3],["技术部",2,2],["市场部",1,1],["人力部",1,1],["运营部",1,1]],
+  meeting: { 总场次:15, 准时率:96.4, 异常次数:1 }
+};
+
+function getPassed(){return CANDIDATES.filter(function(c){return c[7]==="通过"})}
+function getFailed(){return CANDIDATES.filter(function(c){return c[7]==="淘汰"})}
+function getNext(){return CANDIDATES.filter(function(c){return c[9]==="是"})}
+function countBy(arr,idx){var o={};arr.forEach(function(d){var k=d[idx];o[k]=(o[k]||0)+1});return o}
+
+// ================================================================
+// CHART 1: EDUCATION DONUT
+// ================================================================
+function renderEdu(){
+  var c=echarts.init(document.getElementById('chart1'));
+  var d=countBy(CANDIDATES,2);
+  var keys=Object.keys(d);
+  var vals=keys.map(function(k){return d[k]});
+  var md=((d['硕士']||0)+(d['博士']||0))/CANDIDATES.length*100;
+  c.setOption({
+    tooltip:{trigger:'item',formatter:'{b}: {c}人 ({d}%)'},
+    graphic:[{
+      type:'text',left:'center',top:'center',style:{
+        text:md.toFixed(1)+'%',textAlign:'center',fill:'#64B5F6',
+        fontSize:22,fontWeight:700
+      }
+    },{
+      type:'text',left:'center',top:'55%',style:{
+        text:'硕博占比',textAlign:'center',fill:'#546E7A',
+        fontSize:11
+      }
+    }],
+    series:[{
+      type:'pie',radius:['42%','68%'],padAngle:2,
+      label:{formatter:'{b}\n{c}人 ({d}%)',fontSize:11,fontWeight:600,color:'#b0bec5'},
+      data:keys.map(function(k,i){return{value:vals[i],name:k}}),
+      color:['#1565C0','#546E7A','#FFC107'],
+      itemStyle:{borderRadius:6,borderColor:'#0a0e1a',borderWidth:2}
+    }]
+  });window.addEventListener('resize',function(){c.resize()});
+}
+
+// ================================================================
+// CHART 2: FUNNEL
+// ================================================================
+function renderFunnel(){
+  var c=echarts.init(document.getElementById('chart2'));
+  var f=SYS.funnel;
+  var fd=[
+    {value:f['报名'],name:'报名'},
+    {value:f['初筛到场'],name:'初筛到场'},
+    {value:f['完成全流程面试'],name:'完成全流程面试'},
+    {value:f['进入下一流程'],name:'进入下一流程'}
+  ];
+  c.setOption({
+    tooltip:{trigger:'item',formatter:'{b}: {c}人'},
+    series:[{
+      type:'funnel',left:'3%',right:'12%',top:5,bottom:5,
+      minSize:'25%',maxSize:'100%',sort:'descending',gap:4,
+      label:{
+        show:true,position:'inside',
+        formatter:function(p){
+          if(p.dataIndex===3) return '{b|'+p.name+'}\n{h|'+p.value+'人}';
+          return '{b|'+p.name+'}\n{v|'+p.value+'人}';
+        },
+        rich:{
+          b:{fontSize:11,fontWeight:600,color:'#fff'},
+          v:{fontSize:15,fontWeight:700,color:'#fff',lineHeight:22},
+          h:{fontSize:22,fontWeight:700,color:'#FFD54F',lineHeight:28}
+        }
+      },
+      itemStyle:{borderColor:'#0a0e1a',borderWidth:2},
+      data:fd.map(function(d,i){
+        if(i===3) return {value:d.value,name:d.name,itemStyle:{
+          color:{type:'linear',x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:'#FF8F00'},{offset:1,color:'#FFC107'}]}}
+        };
+        return d;
+      }),
+      color:[{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'#1976D2'},{offset:1,color:'#0d47a1'}]},
+        {type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'#00897B'},{offset:1,color:'#004D40'}]},
+        {type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'#388E3C'},{offset:1,color:'#1B5E20'}]},
+        null]
+    }]
+  });window.addEventListener('resize',function(){c.resize()});
+}
+
+// ================================================================
+// CHART 3: PASS RATE
+// ================================================================
+function renderPassRate(){
+  var c=echarts.init(document.getElementById('chart3'));
+  var f=SYS.funnel, bench=SYS.passBenchmark;
+  var pass1=Math.round(f['完成全流程面试']/f['初筛到场']*100);
+  var pass2=Math.round(getPassed().length/f['完成全流程面试']*100);
+  var pass3=Math.round(getNext().length/f['完成全流程面试']*100);
+  var cur=[pass1,pass2,pass3];
+  var bv=[bench['初筛'],bench['单面'],bench['群面']];
+  var lbs=['初筛通过率','单面通过率','群面通过率'];
+  c.setOption({
+    tooltip:{trigger:'axis',formatter:function(ps){
+      var s=ps[0].axisValue+'<br/>';
+      ps.forEach(function(p){s+='<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+p.color+';margin-right:4px"></span>'+p.seriesName+': <b>'+p.value+'%</b><br/>'});
+      return s;
+    }},
+    legend:{data:['本期通过率','往期基准'],bottom:0,textStyle:{fontSize:10,color:'#78909C'}},
+    grid:{left:40,right:15,top:10,bottom:40},
+    xAxis:{type:'category',data:lbs,axisLabel:{fontSize:11,fontWeight:600,color:'#b0bec5'}},
+    yAxis:{type:'value',max:100,axisLabel:{formatter:'{value}%',color:'#546E7A'},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)',type:'dashed'}}},
+    series:[{
+      name:'本期通过率',type:'bar',barWidth:'28%',barGap:'15%',
+      data:cur.map(function(v,i){
+        return{value:v,itemStyle:{color:v>=bv[i]?{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'#4CAF50'},{offset:1,color:'#2E7D32'}]}:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'#FF8A65'},{offset:1,color:'#D84315'}]},borderRadius:[4,4,0,0]}};
+      }),
+      label:{show:true,position:'top',formatter:'{c}%',fontWeight:600,fontSize:12,color:function(p){return cur[p.dataIndex]>=bv[p.dataIndex]?'#4CAF50':'#FF8A65'}}
+    },{
+      name:'往期基准',type:'bar',barWidth:'28%',
+      data:bv.map(function(v){return{value:v,itemStyle:{color:'rgba(255,255,255,0.08)',borderRadius:[4,4,0,0]}}}),
+      label:{show:true,position:'top',formatter:'{c}%',fontSize:10,color:'#546E7A'}
+    }]
+  });window.addEventListener('resize',function(){c.resize()});
+}
+
+// ================================================================
+// CHART 4: CITY
+// ================================================================
+function renderCity(){
+  var cd=countBy(CANDIDATES,5);
+  var order=Object.keys(cd).sort(function(a,b){return cd[b]-cd[a]});
+  var vals=order.map(function(k){return cd[k]});
+  var colors=['#1565C0','#1976D2','#1E88E5','#2196F3','#42A5F5','#64B5F6','#90CAF9','#BBDEFB','#4DB6AC','#26A69A'];
+  var c4=echarts.init(document.getElementById('chart4'));
+  c4.setOption({
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:function(p){return p[0].name+': <b>'+p[0].value+' 人</b>'}},
+    grid:{left:50,right:15,top:5,bottom:5},
+    xAxis:{type:'value',axisLabel:{fontSize:10,color:'#546E7A'},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)',type:'dashed'}}},
+    yAxis:{type:'category',data:order,axisLabel:{fontSize:11,fontWeight:600,color:'#b0bec5'},axisLine:{show:false},axisTick:{show:false}},
+    series:[{
+      type:'bar',barWidth:'55%',
+      data:vals.map(function(v,i){return{value:v,itemStyle:{color:colors[i]||'#64B5F6',borderRadius:[0,6,6,0]}}}),
+      label:{show:true,position:'right',formatter:'{c}人',fontSize:11,fontWeight:600,color:'#e8eaf0'}
+    }]
+  });window.addEventListener('resize',function(){c.resize()});
+  // Heatmap
+  var gridItems=[
+    {city:'哈尔滨',row:0,col:0},{city:'北京',row:0,col:2},
+    {city:'厦门',row:1,col:2},{city:'香港',row:2,col:4},
+    {city:'广州',row:2,col:3},{city:'深圳',row:3,col:3}
+  ];
+  gridItems.forEach(function(g){g.val=cd[g.city]||0});
+  var maxV=Math.max.apply(null,gridItems.map(function(g){return g.val}))||1;
+  var hh='';
+  gridItems.forEach(function(g){
+    var i=Math.min(1,g.val/maxV);
+    var r=Math.round(20+80*i), b2=Math.round(60+120*i);
+    hh+='<div class="hm-cell" style="background:rgb(8,'+r+','+b2+');grid-column:'+(g.col+1)+'">'+
+      '<div class="ct">'+g.city+'</div><div class="cnt">'+g.val+'人</div></div>';
+  });
+  document.getElementById('heatmapGrid').innerHTML=hh;
+}
+
+// ================================================================
+// CHART 5: SCHOOL TIER
+// ================================================================
+function renderSchool(){
+  var c5=echarts.init(document.getElementById('chart5'));
+  var tiers=['985','211','双一流','普通本科'];
+  var passT={},failT={};
+  tiers.forEach(function(t){passT[t]=0;failT[t]=0});
+  CANDIDATES.forEach(function(d){
+    var t=d[4];
+    if(d[7]==='通过'){if(passT[t]!==undefined)passT[t]++}else{if(failT[t]!==undefined)failT[t]++}
+  });
+  var labels=[],passV=[],failV=[];
+  tiers.forEach(function(t){
+    var p=passT[t]||0,f=failT[t]||0;
+    if(p+f>0){labels.push(t+'('+(p+f)+')');passV.push(p);failV.push(f)}
+  });
+  c5.setOption({
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:function(ps){
+      return ps[0].axisValue+'<br/>'+ps.map(function(p){
+        return '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+p.color+';margin-right:4px"></span>'+p.seriesName+': <b>'+p.value+'</b>';
+      }).join('<br/>');
+    }},
+    legend:{data:['通过','淘汰'],bottom:0,textStyle:{fontSize:10,color:'#78909C'}},
+    grid:{left:45,right:20,top:10,bottom:40},
+    xAxis:{type:'category',data:labels,axisLabel:{fontSize:11,fontWeight:600,color:'#b0bec5'}},
+    yAxis:{type:'value',axisLabel:{color:'#546E7A'},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)',type:'dashed'}}},
+    series:[{
+      name:'通过',type:'bar',stack:'total',barWidth:'40%',
+      data:passV.map(function(v){return{value:v,itemStyle:{color:'#4CAF50',borderRadius:[6,6,0,0]}}}),
+      label:{show:true,position:'inside',formatter:'{c}人',color:'#fff',fontWeight:600,fontSize:12}
+    },{
+      name:'淘汰',type:'bar',stack:'total',barWidth:'40%',
+      data:failV.map(function(v){return{value:v,itemStyle:{color:'rgba(255,255,255,0.06)',borderRadius:[0,0,6,6]}}}),
+      label:{show:true,position:'inside',formatter:'{c}人',color:'#78909C',fontWeight:500,fontSize:11}
+    }]
+  });window.addEventListener('resize',function(){c5.resize()});
+}
+
+// ================================================================
+// CHART 6: INTERVIEWER
+// ================================================================
+function renderInterviewer(){
+  var c6=echarts.init(document.getElementById('chart6'));
+  var iv=SYS.interviewer;
+  var depts=iv.map(function(d){return d[0]}), exp=iv.map(function(d){return d[1]}), act=iv.map(function(d){return d[2]});
+  var tExp=exp.reduce(function(a,b){return a+b},0), tAct=act.reduce(function(a,b){return a+b},0);
+  c6.setOption({
+    tooltip:{trigger:'axis',formatter:function(ps){
+      var s=ps[0].axisValue+'<br/>';
+      ps.forEach(function(p){s+='<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+p.color+';margin-right:4px"></span>'+p.seriesName+': <b>'+p.value+'</b><br/>'});
+      return s;
+    }},
+    legend:{data:['应到','实到','缺勤'],bottom:0,textStyle:{fontSize:9,color:'#78909C'},icon:'roundRect',itemWidth:10,itemHeight:6},
+    grid:{left:40,right:15,top:10,bottom:40},
+    xAxis:{type:'category',data:depts,axisLabel:{fontSize:11,fontWeight:600,color:'#b0bec5'}},
+    yAxis:{type:'value',axisLabel:{color:'#546E7A'},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)',type:'dashed'}}},
+    series:[{
+      name:'应到',type:'bar',barWidth:'22%',barGap:'5%',
+      data:exp.map(function(v){return{value:v,itemStyle:{color:'rgba(33,150,243,0.5)',borderRadius:[3,3,0,0]}}})
+    },{
+      name:'实到',type:'bar',barWidth:'22%',
+      data:act.map(function(v,i){
+        return{value:v,itemStyle:{color:v===exp[i]?'#4CAF50':'#81C784',borderRadius:[3,3,0,0]}};
+      }),
+      label:{show:true,position:'top',formatter:function(){return tAct+'/'+tExp+' 全员到齐';},fontSize:10,fontWeight:600,color:'#4CAF50'}
+    },{
+      name:'缺勤',type:'bar',barWidth:'22%',
+      data:exp.map(function(v,i){return{value:v-act[i],itemStyle:{color:act[i]<v?'rgba(239,154,154,0.5)':'rgba(255,255,255,0.03)',borderRadius:[3,3,0,0]}}})
+    }]
+  });window.addEventListener('resize',function(){c6.resize()});
+}
+
+// ================================================================
+// CHART 8: BOXPLOT
+// ================================================================
+function renderBoxplot(){
+  var c8=echarts.init(document.getElementById('chart8'));
+  var sc=CANDIDATES.map(function(d){return d[8]}).sort(function(a,b){return a-b});
+  var min=sc[0],max=sc[sc.length-1],q1=sc[Math.floor(sc.length*0.25)],med=sc[Math.floor(sc.length*0.5)],q3=sc[Math.floor(sc.length*0.75)];
+  var next=getNext().sort(function(a,b){return b[8]-a[8]});
+  c8.setOption({
+    tooltip:{trigger:'axis',formatter:function(){
+      return '群面得分<br/>最小值: '+min+'<br/>Q1: '+q1+'<br/>中位数: '+med+'<br/>Q3: '+q3+'<br/>最大值: '+max;
+    }},
+    grid:{left:40,right:15,top:15,bottom:25},
+    xAxis:{type:'category',data:['群面得分'],axisLabel:{fontSize:12,fontWeight:600,color:'#b0bec5'}},
+    yAxis:{type:'value',min:40,max:100,axisLabel:{formatter:'{value}分',color:'#546E7A'},splitLine:{lineStyle:{color:'rgba(255,255,255,0.04)',type:'dashed'}}},
+    series:[{
+      name:'分布',type:'boxplot',data:[[min,q1,med,q3,max]],
+      itemStyle:{color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'rgba(33,150,243,0.5)'},{offset:1,color:'rgba(0,188,212,0.4)'}]},borderColor:'#64B5F6',borderWidth:2},
+      width:'35%'
+    },{
+      name:'高分',type:'scatter',
+      data:next.map(function(d){
+        return{value:[0,d[8]],itemStyle:{color:{type:'radial',colorStops:[{offset:0,color:'#FFC107'},{offset:1,color:'#FF8F00'}]},borderColor:'#fff',borderWidth:1},symbolSize:d[8]>=90?14:10};
+      }),
+      label:{show:true,position:'top',formatter:function(p){return p.value[1]+'分'},fontSize:10,fontWeight:600,color:'#FFC107'}
+    }]
+  });window.addEventListener('resize',function(){c8.resize()});
+
+  // TOP list
+  var tl='',tcols=['rk1','rk2','rk3','rkn','rkn','rkn'];
+  next.forEach(function(d,i){
+    tl+='<li><span class="rk '+(tcols[i]||'rkn')+'">'+(i+1)+'</span><span class="nm">'+d[0]+'</span><span class="sc">'+d[8]+'</span></li>';
+  });
+  document.getElementById('topList').innerHTML=tl;
+}
+
+// ================================================================
+// EXCEL UPLOAD
+// ================================================================
+document.getElementById('fileInput').addEventListener('change',function(e){
+  var file=e.target.files[0];if(!file)return;
+  var st=document.getElementById('uploadStatus');st.textContent='解析中...';
+  var r=new FileReader();
+  r.onload=function(ev){
+    try{
+      var wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
+      var json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1});
+      if(json.length<2){st.textContent='数据不足';return;}
+      var h=json[0];
+      var idxMap={'姓名':0,'性别':1,'学历':2,'最高院校':3,'院校类型':4,'城市':5,'专业':6,'面试结果':7,'群面得分':8,'是否进入下一流程':9};
+      var fi={};
+      h.forEach(function(c,i){var k=Object.keys(idxMap).find(function(kk){return c.indexOf(kk)>=0});if(k)fi[k]=i;});
+      var nc=[];
+      for(var i=1;i<json.length;i++){
+        var row=json[i];if(!row||!row[0])continue;
+        var data=Object.keys(idxMap).map(function(k){
+          var idx=fi[k]!==undefined?fi[k]:idxMap[k];
+          return row[idx]!==undefined?String(row[idx]).trim():'';
+        });
+        if(data[0]&&data[0]!=='姓名'){data[8]=parseInt(data[8])||0;nc.push(data);}
+      }
+      if(nc.length){CANDIDATES=nc;renderAll();st.textContent='OK '+nc.length+' 条';st.style.color='#4CAF50';}
+      else st.textContent='未解析到有效数据';
+    }catch(err){st.textContent='失败: '+err.message;st.style.color='#FF8A65';}
+  };
+  r.readAsArrayBuffer(file);
+});
+
+document.getElementById('downloadTmpl').addEventListener('click',function(){
+  var wsData=[['姓名','性别','学历','最高院校','院校类型','城市','专业','面试结果','群面得分','是否进入下一流程']];
+  CANDIDATES.forEach(function(d){wsData.push(d);});
+  var ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols']=[{wch:8},{wch:4},{wch:6},{wch:14},{wch:12},{wch:8},{wch:18},{wch:8},{wch:8},{wch:10}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'候选人数据');
+  var meta=[['参数','值'],['报名人数',60],['初筛到场',32],['完成全流程面试',11],['进入下一流程',6],
+    ['面试总场次',15],['准时开场率(%)',96.4],['流程异常次数',1]];
+  var mws=XLSX.utils.aoa_to_sheet(meta);
+  XLSX.utils.book_append_sheet(wb,mws,'系统参数');
+  XLSX.writeFile(wb,'GEU管培生面试数据模板.xlsx');
+});
+
+function renderAll(){renderEdu();renderFunnel();renderPassRate();renderCity();renderSchool();renderInterviewer();renderBoxplot();}
+renderAll();
+</script>
+</body>
+</html>
